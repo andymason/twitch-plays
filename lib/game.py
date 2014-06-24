@@ -1,19 +1,30 @@
-import win32api
-import win32con
+import uinput
 import time
 
 class Game:
 
     keymap = {
-        'up': 0x30,
-        'down': 0x31,
-        'left': 0x32,
-        'right': 0x33,
-        'a': 0x34,
-        'b': 0x35,
-        'start': 0x36,
-        'select': 0x37
+        'up': uinput.KEY_1,
+        'down': uinput.KEY_2,
+        'left': uinput.KEY_3,
+        'right': uinput.KEY_4,
+        'a': uinput.KEY_5,
+        'b': uinput.KEY_6,
+        'start': uinput.KEY_7,
+        'select': uinput.KEY_8
     }
+    events = (
+        uinput.KEY_1,
+        uinput.KEY_2,
+        uinput.KEY_3,
+        uinput.KEY_4,
+        uinput.KEY_5,
+        uinput.KEY_6,
+        uinput.KEY_7,
+        uinput.KEY_8
+        )
+
+    device = uinput.Device(events)
 
     def get_valid_buttons(self):
         return [button for button in self.keymap.keys()]
@@ -25,6 +36,5 @@ class Game:
         return self.keymap[button]
 
     def push_button(self, button):
-        win32api.keybd_event(self.button_to_key(button), 0, 0, 0)
+        self.device.emit_click(self.button_to_key(button))
         time.sleep(.15)
-        win32api.keybd_event(self.button_to_key(button), 0, win32con.KEYEVENTF_KEYUP, 0)

@@ -37,9 +37,14 @@ class Irc:
 
         sock.settimeout(None)
 
-        sock.send('USER %s\r\n' % username)
-        sock.send('PASS %s\r\n' % password)
+        NICK="guTest"
+        IDENT="gutest"
+        REALNAME="guTestName"
+
+        #sock.send('USER %s\r\n' % username)
+        #sock.send('PASS %s\r\n' % password)
         sock.send('NICK %s\r\n' % username)
+        sock.send("USER %s %s bla :%s\r\n" % (IDENT, server, REALNAME))
 
         if not self.check_login_status(self.recv()):
             pp('Invalid login.', 'error')
@@ -73,11 +78,12 @@ class Irc:
         if not re.match(r'^:(testserver\.local|tmi\.twitch\.tv) NOTICE \* :Login unsuccessful\r\n$', data): return True
 
     def check_has_message(self, data):
-        return re.match(r'^:[a-zA-Z0-9_]+\![a-zA-Z0-9_]+@[a-zA-Z0-9_]+(\.tmi\.twitch\.tv|\.testserver\.local) PRIVMSG #[a-zA-Z0-9_]+ :.+$', data)
+        return re.match(r'^:[a-zA-Z0-9_]+\![a-zA-Z0-9_~]+@[a-zA-Z0-9_-]+(\.tmi\.twitch\.tv|\.testserver\.local|\.guardian\.co\.uk) PRIVMSG #[a-zA-Z0-9_]+ :.+$', data)
 
-    def parse_message(self, data): 
+    def parse_message(self, data):
+        pp(re.findall(r'^:.+\![a-zA-Z0-9_~]+@[a-zA-Z0-9_-]+.+ PRIVMSG (.*?) :', data))
         return {
-            'channel': re.findall(r'^:.+\![a-zA-Z0-9_]+@[a-zA-Z0-9_]+.+ PRIVMSG (.*?) :', data)[0],
-            'username': re.findall(r'^:([a-zA-Z0-9_]+)\!', data)[0],
-            'message': re.findall(r'PRIVMSG #[a-zA-Z0-9_]+ :(.+)', data)[0].decode('utf8')
+            'channel': re.findall(r'^:.+\![a-zA-Z0-9_~]+@[a-zA-Z0-9_-]+.+ PRIVMSG (.*?) :', data)[0],
+            'username': re.findall(r'^:([a-zA-Z0-9_~]+)\!', data)[0],
+            'message': re.findall(r'PRIVMSG #[a-zA-Z0-9_~]+ :(.+)', data)[0].decode('utf8')
         }
